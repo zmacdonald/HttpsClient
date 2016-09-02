@@ -3,10 +3,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.net.ssl.*;
-import java.io.BufferedInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.security.cert.X509Certificate;
@@ -23,18 +20,47 @@ public class HttpsClient {
     private HttpsClient() {
     }
 
+    /**
+     * @return the singleton instance of the HttpsClient
+     */
     public static HttpsClient getInstance() {
         if (instance == null)
             instance = new HttpsClient();
         return instance;
     }
 
-    public HttpResponse get(String stringUrl, ValuePair... params) {
+    /**
+     * HTTP GET method accepting a json string of parameters
+     *
+     * @param stringUrl the url to be connected to
+     * @param params    a string of parameters in json format
+     * @return  a json object of the http response message
+     */
+    public JSONObject get(String stringUrl, String params) {
         JSONObject json = getJson(params);
         return get(stringUrl, json);
     }
 
-    public HttpResponse get(String stringUrl, JSONObject params){
+    /**
+     * HTTP GET method accepting an array of value pairs as parameters
+     *
+     * @param stringUrl the url to be connected to
+     * @param params    one or more pairs of strings to be used as parameters
+     * @return  a json object of the http response message
+     */
+    public JSONObject get(String stringUrl, ValuePair... params) {
+        JSONObject json = getJson(params);
+        return get(stringUrl, json);
+    }
+
+    /**
+     * HTTP GET method accepting a json object of parameters
+     *
+     * @param stringUrl the url to be connected to
+     * @param params    a json object of parameters
+     * @return  a json object of the http response message
+     */
+    public JSONObject get(String stringUrl, JSONObject params) {
         openConnection(stringUrl);
 
         try {
@@ -46,18 +72,40 @@ public class HttpsClient {
         if (params != null) {
             addParams(params);
         }
-        getResponse();
-
-        connection.disconnect();
-        return null;
+        return getResponse();
     }
 
-    public HttpResponse put(String stringUrl, ValuePair... params){
+    /**
+     * HTTP PUT method accepting a json string of parameters
+     *
+     * @param stringUrl the url to be connected to
+     * @param params    a string of parameters in json format
+     * @return  a json object of the http response message
+     */
+    public JSONObject put(String stringUrl, String params) {
         JSONObject json = getJson(params);
         return put(stringUrl, json);
     }
 
-    public HttpResponse put(String stringUrl, JSONObject params) {
+    /**
+     * HTTP PUT method accepting an array of value pairs as parameters
+     *
+     * @param stringUrl the url to be connected to
+     * @param params    one or more pairs of strings to be used as parameters
+     * @return  a json object of the http response message
+     */
+    public JSONObject put(String stringUrl, ValuePair... params) {
+        JSONObject json = getJson(params);
+        return put(stringUrl, json);
+    }
+
+    /**
+     * HTTP PUT method accepting a json object of parameters
+     * @param stringUrl the url to be connected to
+     * @param params    a json object of parameters
+     * @return  a json object of the http response message
+     */
+    public JSONObject put(String stringUrl, JSONObject params) {
 
         openConnection(stringUrl);
 
@@ -70,20 +118,41 @@ public class HttpsClient {
         if (params != null) {
             addParams(params);
         }
-        getResponse();
-
-        connection.disconnect();
-
-        return null;
+        return getResponse();
     }
 
-    public HttpResponse post(String stringUrl, ValuePair... params) {
-
+    /**
+     * HTTP POST method accepting a json string of parameters
+     *
+     * @param stringUrl the url to be connected to
+     * @param params    a string of parameters in json format
+     * @return  a json object of the http response message
+     */
+    public JSONObject post(String stringUrl, String params) {
         JSONObject json = getJson(params);
-        return post(stringUrl,json);
+        return post(stringUrl, json);
     }
 
-    public HttpResponse post(String stringUrl, JSONObject params){
+    /**
+     * HTTP POST method accepting an array of value pairs as parameters
+     *
+     * @param stringUrl the url to be connected to
+     * @param params    one or more pairs of strings to be used as parameters
+     * @return  a json object of the http response message
+     */
+    public JSONObject post(String stringUrl, ValuePair... params) {
+        JSONObject json = getJson(params);
+        return post(stringUrl, json);
+    }
+
+    /**
+     * HTTP POST method accepting a json object of parameters
+     *
+     * @param stringUrl the url to be connected to
+     * @param params    a json object of parameters
+     * @return  a json object of the http response message
+     */
+    public JSONObject post(String stringUrl, JSONObject params) {
         openConnection(stringUrl);
 
         try {
@@ -95,18 +164,41 @@ public class HttpsClient {
         if (params != null) {
             addParams(params);
         }
-        getResponse();
-
-        connection.disconnect();
-        return null;
+        return getResponse();
     }
 
-    public HttpResponse delete(String stringUrl, ValuePair... params){
+    /**
+     * HTTP DELETE method accepting a json string of parameters
+     *
+     * @param stringUrl the url to be connected to
+     * @param params    a string of parameters in json format
+     * @return  a json object of the http response message
+     */
+    public JSONObject delete(String stringUrl, String params) {
         JSONObject json = getJson(params);
         return delete(stringUrl, json);
     }
 
-    public HttpResponse delete(String stringUrl, JSONObject params) {
+    /**
+     * HTTP DELETE method accepting an array of value pairs as parameters
+     *
+     * @param stringUrl the url to be connected to
+     * @param params    one or more pairs of strings to be used as parameters
+     * @return  a json object of the http response message
+     */
+    public JSONObject delete(String stringUrl, ValuePair... params) {
+        JSONObject json = getJson(params);
+        return delete(stringUrl, json);
+    }
+
+    /**
+     * HTTP DELETE method accepting a json object of parameters
+     *
+     * @param stringUrl the url to be connected to
+     * @param params    a json object of parameters
+     * @return  a json object of the http response message
+     */
+    public JSONObject delete(String stringUrl, JSONObject params) {
         openConnection(stringUrl);
 
         try {
@@ -118,16 +210,25 @@ public class HttpsClient {
         if (params != null) {
             addParams(params);
         }
-        getResponse();
 
-        connection.disconnect();
-
-        return null;
+        return getResponse();
     }
 
+    /**
+     * sets the authorization string used in the Http header
+     *
+     * @param username web server username
+     * @param password web server password
+     */
     public void setAuthorization(String username, String password) {
-            authorization = "Basic " + Base64.encode((username + ":" + password).getBytes());
-            System.out.println(authorization);
+        byte[] data = new byte[0];
+        try {
+            data = (username + ":" + password).getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        authorization = "Basic " + Base64.encode(data);
+        System.out.println(authorization);
     }
 
     private void openConnection(String stringUrl) {
@@ -137,7 +238,8 @@ public class HttpsClient {
 
             connection.setConnectTimeout(3000);
             connection.setReadTimeout(3000);
-            connection.setRequestProperty("Authorization", authorization);
+            if (authorization != null && !authorization.isEmpty())
+                connection.setRequestProperty("Authorization", authorization);
             connection.getDoInput();
             connection.setRequestProperty("Accept", "application/json");
         } catch (Exception e) {
@@ -148,12 +250,12 @@ public class HttpsClient {
     private void addParams(JSONObject json) {
 
         connection.setDoOutput(true);
-        connection.setRequestProperty("Content-Type","application/json");
-        connection.setRequestProperty("Content-Length",String.valueOf(json.toString().length()));
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setRequestProperty("Content-Length", String.valueOf(json.toString().length()));
         DataOutputStream wr = null;
         try {
             wr = new DataOutputStream(connection.getOutputStream());
-            System.out.println("parameters out: "+json.toString());
+            System.out.println("parameters out: " + json.toString());
             wr.writeBytes(json.toString());
             wr.flush();
             wr.close();
@@ -163,8 +265,8 @@ public class HttpsClient {
 
     }
 
-    private JSONObject getJson(ValuePair[] params){
-        if(params==null)
+    private JSONObject getJson(ValuePair[] params) {
+        if (params == null)
             return null;
 
         JSONObject json = new JSONObject();
@@ -180,8 +282,8 @@ public class HttpsClient {
         return json;
     }
 
-    private JSONObject getJson(String params){
-        if(params==null||params.isEmpty())
+    private JSONObject getJson(String params) {
+        if (params == null || params.isEmpty())
             return null;
 
         JSONObject json = new JSONObject();
@@ -195,23 +297,25 @@ public class HttpsClient {
         return json;
     }
 
-    private HttpResponse getResponse() {
+    private JSONObject getResponse() {
+        JSONObject jsonObject = null;
         try {
             System.out.println("Response code: " + connection.getResponseCode());
             System.out.println("msg: " + connection.getResponseMessage());
             // read the response
             InputStream in = new BufferedInputStream(connection.getInputStream());
             String result = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
-            JSONObject jsonObject = new JSONObject(result);
-            System.out.println("message back: "+result);
+            jsonObject = new JSONObject(result);
+            System.out.println("message back: " + result);
 
             in.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        connection.disconnect();
 
-        return null;
+        return jsonObject;
     }
 
     private void trustAllHosts() {
